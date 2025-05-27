@@ -9,7 +9,7 @@ app.use(express.json());
 connectDB();
 
 //rutas
-app.use('/auth', require('./routes/auth'));
+app.use('/auth', require('./routes/authRoutes'));
 
 //error
 app.use((err, req, res, next) => {

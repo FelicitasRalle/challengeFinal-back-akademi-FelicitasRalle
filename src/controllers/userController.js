@@ -7,7 +7,7 @@ exports.getAllUsers = async (req, res, next)=>{
         const users = await User.find().select('-password');
         res.json(users);
     }catch(error){
-        next(error);
+        next(err);
     }
 };
 
@@ -24,7 +24,7 @@ exports.getUser = async (req, res, next) =>{
         }
         res.json(user);
     }catch(error){
-        next(error);
+        next(err);
     }
 };
 
@@ -58,7 +58,7 @@ exports.deleteUser = async (req, res, next)=>{
             return res.status(404).json({ message: 'El usuario no existe' });
         }
         res.json({ message: 'El usuario se ha eliminado correctamente' });
-    }catch(error){
-        next(error);
+    }catch(err){
+        next(err);
     }
 };

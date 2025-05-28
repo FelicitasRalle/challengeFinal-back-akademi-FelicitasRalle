@@ -1,29 +1,33 @@
 const express = require('express');
 const { body } = require('express-validator');
 const { register, login } = require('../controllers/authController');
+
 const router = express.Router();
 
-// registro es solo para alumnos
+// POST /auth/register
+// registra un alumno (role: 'student')
 router.post(
   '/register',
   [
-    body('firstName').notEmpty(),
-    body('lastName').notEmpty(),
-    body('email').isEmail(),
-    body('password').isLength({ min: 6 })
+    body('firstName').notEmpty().withMessage('firstName es obligatorio'),
+    body('lastName').notEmpty().withMessage('lastName es obligatorio'),
+    body('email').isEmail().withMessage('email inválido'),
+    body('password').isLength({ min: 6 }).withMessage('password min 6 caracteres')
   ],
   register
 );
 
-//login para el resto de los roles
+// POST /auth/login
+// autentica usuario y devuelve jwt
 router.post(
   '/login',
   [
-    body('email').isEmail(),
-    body('password').notEmpty()
+    body('email').isEmail().withMessage('email inválido'),
+    body('password').notEmpty().withMessage('password es obligatorio')
   ],
   login
 );
 
 module.exports = router;
+
 

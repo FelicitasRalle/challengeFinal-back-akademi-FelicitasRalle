@@ -1,17 +1,22 @@
-require('dotenv').config();
 const express = require('express');
+require('dotenv').config();
 const connectDB = require('./config/db');
 
 const app = express();
+
+//middleware global
 app.use(express.json());
 
 //conexion a mongo
 connectDB();
 
-//rutas
-app.use('/auth', require('./routes/authRoutes'));
+//rutas de auth
+app.use('/auth', require('./routes/auth'));
 
-//error
+//rutas de usuario
+app.use('/users', require('./routes/users'));
+
+//middleware de errores
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(err.status || 500).json({ message: err.message });

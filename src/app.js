@@ -11,7 +11,7 @@ app.use(express.json());
 connectDB();
 
 //rutas de auth
-app.use('/auth', require('./routes/auth'));
+app.use('/auth', require('./routes/authRoutes'));
 
 //rutas de usuario
 app.use('/users', require('./routes/users'));

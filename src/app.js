@@ -16,6 +16,9 @@ app.use('/auth', require('./routes/authRoutes'));
 //rutas de usuario
 app.use('/users', require('./routes/usersRoutes'));
 
+//rutas de cursos
+app.use('/courses', require('./routes/coursesRoutes'));
+
 //middleware de errores
 app.use((err, req, res, next) => {
   console.error(err);

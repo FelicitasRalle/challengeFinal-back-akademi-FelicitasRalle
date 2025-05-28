@@ -14,7 +14,7 @@ connectDB();
 app.use('/auth', require('./routes/authRoutes'));
 
 //rutas de usuario
-app.use('/users', require('./routes/users'));
+app.use('/users', require('./routes/usersRoutes'));
 
 //middleware de errores
 app.use((err, req, res, next) => {

@@ -84,7 +84,7 @@ exports.getCoursesByProfessor = async (req, res, next)=>{
         if(req.user.rolo !== 'professor' || req.user._id.toString() !== professorId){
             return res.status(403).json({ message: 'Acceso denegado' });
         }
-        const courses = await Course.fin({ professor: professorId });
+        const courses = await Course.find({ professor: professorId });
         res.josn(courses);
     }catch(err){
         next(err);

@@ -9,7 +9,7 @@ const { protect, restrictTo } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-//todas las rutas necesitarean el token valido
+//todas las rutas necesitaran el token valido
 router.use(protect);
 
 router.post(

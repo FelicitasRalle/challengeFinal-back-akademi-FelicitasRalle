@@ -26,15 +26,36 @@ exports.createUser = async (req, res, next) => {
 
 
 //GET/users (solo el superadmin)
-exports.getAllUsers = async (req, res, next)=>{
-    try{
-        const users = await User.find().select('-password');
-        res.json(users);
-    }catch(error){
-        next(err);
-    }
-};
+exports.getAllUsers = async (req, res, next) => {
+  try {
+    const { email, role, firstName, lastName, page = 1, limit = 10, sort = '-createdAt' } = req.query;
+    const filter = {};
+    if (email)     filter.email     = email;
+    if (role)      filter.role      = role;
+    if (firstName) filter.firstName = new RegExp(firstName, 'i');
+    if (lastName)  filter.lastName  = new RegExp(lastName, 'i');
 
+    const skip = (page - 1) * limit;
+    const [ total, users ] = await Promise.all([
+      User.countDocuments(filter),
+      User.find(filter)
+          .select('-password')
+          .sort(sort)
+          .skip(skip)
+          .limit(Number(limit))
+    ]);
+
+    res.json({
+      total,
+      page: Number(page),
+      pages: Math.ceil(total / limit),
+      limit: Number(limit),
+      users
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 
 //GET/users:id (superadmin o el mismo usuario)
 exports.getUser = async (req, res, next) =>{

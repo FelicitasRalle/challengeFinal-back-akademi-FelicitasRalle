@@ -50,35 +50,40 @@ exports.updateGrade = async (req, res, next)=>{
 exports.getGradesByStudent = async (req, res, next) => {
   try {
     const { studentId } = req.params;
+    const { page = 1, limit = 10, sort = '-createdAt' } = req.query;
 
-    //estudiante solo ve sus notas
-    if (req.user.role === 'student') {
-      if (req.user._id.toString() !== studentId) {
-        return res.status(403).json({ message: 'Acceso denegado' });
-      }
-      const grades = await Grade.find({ student: studentId })
-        .populate('course', 'title category level');
-      return res.json(grades);
+    //verifico el acceso
+    if (req.user.role === 'student' && req.user._id.toString() !== studentId) {
+      return res.status(403).json({ message: 'Acceso denegado' });
     }
 
-    //profesor solo ve las notas de su curso
+    //filtro
+    let filter = { student: studentId };
     if (req.user.role === 'professor') {
-      const allGrades = await Grade.find({ student: studentId })
-        .populate({
-          path: 'course',
-          select: 'title category level professor',
-          match: { professor: req.user._id }
-        });
-      
-      const grades = allGrades.filter(g => g.course);
-      return res.json(grades);
+      //el profesor solo ve notas de sus cursos
+      const myCourses = await Course.find({ professor: req.user._id }).select('_id');
+      const courseIds = myCourses.map(c => c._id);
+      filter.course = { $in: courseIds };
     }
 
-    //superadmin ve todas las notas
-    const grades = await Grade.find({ student: studentId }).populate('course', 'title category level');
-    res.json(grades);
+    const skip = (page - 1) * limit;
+    const [ total, grades ] = await Promise.all([
+      Grade.countDocuments(filter),
+      Grade.find(filter)
+        .populate('course', 'title category level')
+        .sort(sort)
+        .skip(skip)
+        .limit(Number(limit))
+    ]);
 
-  }catch(err){
+    res.json({
+      total,
+      page: Number(page),
+      pages: Math.ceil(total / limit),
+      limit: Number(limit),
+      grades
+    });
+  } catch (err) {
     next(err);
   }
 };

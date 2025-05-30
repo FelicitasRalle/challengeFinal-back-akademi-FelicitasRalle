@@ -5,13 +5,29 @@ const Course     = require('../models/Course');
 exports.getEnrollmentsByStudent = async (req, res, next) => {
   try {
     const { studentId } = req.params;
-    if (req.user.role !== 'student' || req.user._id.toString() !== studentId) {
+    if (req.user.role === 'student' && req.user._id.toString() !== studentId) {
       return res.status(403).json({ message: 'Acceso denegado' });
     }
-    const enrollments = await Enrollment
-      .find({ student: studentId })
-      .populate('course');
-    res.json(enrollments);
+
+    const { page = 1, limit = 10, sort = '-createdAt' } = req.query;
+    const filter = { student: studentId };
+    const skip = (page - 1) * limit;
+    const [ total, enrollments ] = await Promise.all([
+      Enrollment.countDocuments(filter),
+      Enrollment.find(filter)
+        .populate('course', 'title category level')
+        .sort(sort)
+        .skip(skip)
+        .limit(Number(limit))
+    ]);
+
+    res.json({
+      total,
+      page: Number(page),
+      pages: Math.ceil(total / limit),
+      limit: Number(limit),
+      enrollments
+    });
   } catch (err) {
     next(err);
   }

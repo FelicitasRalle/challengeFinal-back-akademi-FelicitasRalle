@@ -22,6 +22,9 @@ app.use('/courses', require('./routes/coursesRoutes'));
 //rutas de inscripciones
 app.use('/enrollments', require('./routes/enrollmentRoutes'));
 
+//rutas de calificaciones
+app.use('/grades', require('./routes/gradesRoutes'));
+
 //middleware de errores
 app.use((err, req, res, next) => {
   console.error(err);

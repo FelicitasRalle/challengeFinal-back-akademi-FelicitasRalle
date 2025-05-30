@@ -33,7 +33,7 @@ router.post(
   login
 );
 
-/ POST /auth/forgot-password
+// POST /auth/forgot-password
 router.post(
   '/forgot-password',
   [ body('email').isEmail().withMessage('email inválido') ],

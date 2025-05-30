@@ -15,7 +15,7 @@ router.use(protect);
 //POST /enrollments
 router.post(
   '/',
-  restrictTo('student'),
+  restrictTo('student', 'superadmin'),
   body('courseId')
     .notEmpty().withMessage('courseId es obligatorio')
     .isMongoId().withMessage('courseId debe ser un ID válido'),
@@ -25,21 +25,21 @@ router.post(
 //GET /enrollments/student/:studentId
 router.get(
   '/student/:studentId',
-  restrictTo('student'),
+  restrictTo('student', 'superadmin'),
   getEnrollmentsByStudent
 );
 
 //DELETE /enrollments/:id
 router.delete(
   '/:id',
-  restrictTo('student'),
+  restrictTo('student', 'superadmin'),
   deleteEnrollment
 );
 
 // GET /enrollments/course/:courseId
 router.get(
   '/course/:courseId',
-  restrictTo('professor'),
+  restrictTo('professor', 'superadmin'),
   getEnrollmentsByCourse
 );
 

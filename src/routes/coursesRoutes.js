@@ -15,11 +15,10 @@ const router = express.Router();
 //proteccion a todas las rutas
 router.use(protect);
 
-router.get('/', restrictTo('student'), getCourses);
-router.get('/:id', getCoursesById);
-router.post('/', restrictTo('professor'), createCourse);
-router.put('/:id', restrictTo('professor'), updateCourse);
-router.delete('/:id', restrictTo('professor'), deleteCourse);
-router.get('/professor/:professorId', restrictTo('professor'), getCoursesByProfessor);
+router.get('/', restrictTo('student','superadmin'), getCourses);
+router.post('/', restrictTo('professor','superadmin'), createCourse);
+router.put('/:id', restrictTo('professor','superadmin'), updateCourse);
+router.delete('/:id', restrictTo('professor','superadmin'), deleteCourse);
+router.get('/professor/:professorId', restrictTo('professor','superadmin'), getCoursesByProfessor);
 
 module.exports = router;

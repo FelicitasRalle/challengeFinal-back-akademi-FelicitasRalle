@@ -14,7 +14,7 @@ router.use(protect);
 
 router.post(
   '/',
-  restrictTo('professor'),
+  restrictTo('professor', 'superadmin'),
   body('studentId').notEmpty().isMongoId(),
   body('courseId' ).notEmpty().isMongoId(),
   body('value'    ).isFloat({ min:0, max:100 }),
@@ -22,13 +22,13 @@ router.post(
 );
 router.put(
   '/:id',
-  restrictTo('professor'),
+  restrictTo('professor', 'superadmin'),
   body('value').isFloat({ min:0, max:100 }),
   updateGrade
 );
 router.get(
   '/student/:studentId',
-  restrictTo('professor','student'),
+  restrictTo('professor','student', 'superadmin'),
   getGradesByStudent
 );
 

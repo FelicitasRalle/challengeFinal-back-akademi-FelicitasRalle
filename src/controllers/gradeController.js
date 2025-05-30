@@ -47,20 +47,38 @@ exports.updateGrade = async (req, res, next)=>{
     }
 };
 
-exports.getGradesByStudent = async (req, res, next)=>{
-    try{
-        const { studentId } = req.params;
+exports.getGradesByStudent = async (req, res, next) => {
+  try {
+    const { studentId } = req.params;
 
-        //si es el estudiantte, solo puede ver su propia nota
-        if(req.user.role === 'student' && req.user._id.toString() !== studentId){
-            return res.status(403).json({ message: 'Acceso denegado' });
-        }
-
-        //restringir para q los profesores solo vean las notas de sus crusos (CORREGIR)
-
-        const grades = await Grade.find({ student: studentId }).populate('course', 'title category level');
-        res.json(grades);
-    }catch(err){
-        next(err);
+    //estudiante solo ve sus notas
+    if (req.user.role === 'student') {
+      if (req.user._id.toString() !== studentId) {
+        return res.status(403).json({ message: 'Acceso denegado' });
+      }
+      const grades = await Grade.find({ student: studentId })
+        .populate('course', 'title category level');
+      return res.json(grades);
     }
+
+    //profesor solo ve las notas de su curso
+    if (req.user.role === 'professor') {
+      const allGrades = await Grade.find({ student: studentId })
+        .populate({
+          path: 'course',
+          select: 'title category level professor',
+          match: { professor: req.user._id }
+        });
+      
+      const grades = allGrades.filter(g => g.course);
+      return res.json(grades);
+    }
+
+    //superadmin ve todas las notas
+    const grades = await Grade.find({ student: studentId }).populate('course', 'title category level');
+    res.json(grades);
+
+  }catch(err){
+    next(err);
+  }
 };

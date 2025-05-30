@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Course = require('../models/Course');
 
 // POST/users
 //creo un usuario con rol 'professor' o 'superadmin' (solo superadmin)
@@ -96,14 +97,28 @@ exports.updateUser = async (req, res, next) => {
 };
 
 //DELETE/users:id (solo superadmin)
-exports.deleteUser = async (req, res, next)=>{
-    try{
-        const user = await User.findByIdAndDelete(req.params.id);
-        if(!user){
-            return res.status(404).json({ message: 'El usuario no existe' });
-        }
-        res.json({ message: 'El usuario se ha eliminado correctamente' });
-    }catch(err){
-        next(err);
+exports.deleteUser = async (req, res, next) => {
+  try {
+    //busco primero un usuario sin eliminarlo
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no existe' });
     }
+
+    //si es profesor, verifico si tiene cursos asociados
+    if (user.role === 'professor') {
+      const count = await Course.countDocuments({ professor: user._id });
+      if (count > 0) {
+        return res
+          .status(409)
+          .json({ message: 'No se puede eliminar un profesor con cursos asignados' });
+      }
+    }
+
+    //eliminar si paso la validacion
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Usuario eliminado' });
+  } catch (err) {
+    next(err);
+  }
 };

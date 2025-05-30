@@ -1,7 +1,31 @@
 const User = require('../models/User');
 
-//GET/users (solo el superadmin)
+// POST/users
+//creo un usuario con rol 'professor' o 'superadmin' (solo superadmin)
+exports.createUser = async (req, res, next) => {
+  try {
+    const { firstName, lastName, email, password, role } = req.body;
+    //valido el rol
+    if (!['professor', 'superadmin'].includes(role)) {
+      return res.status(400).json({ message: 'Rol inválido' });
+    }
+    //crear usuario
+    const user = await User.create({ firstName, lastName, email, password, role });
+    //remover contraseña del output
+    const result = user.toObject();
+    delete result.password;
+    res.status(201).json(result);
+  } catch (err) {
+    //email duplicado
+    if (err.code === 11000) {
+      return res.status(400).json({ message: 'Email ya registrado' });
+    }
+    next(err);
+  }
+};
 
+
+//GET/users (solo el superadmin)
 exports.getAllUsers = async (req, res, next)=>{
     try{
         const users = await User.find().select('-password');

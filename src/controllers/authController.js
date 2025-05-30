@@ -11,16 +11,25 @@ const generateToken = (id, role) => {
 };
 
 // POST /auth/register
+// src/controllers/authController.js
 exports.register = async (req, res, next) => {
   try {
     const { firstName, lastName, email, password } = req.body;
-    const user = await User.create({ firstName, lastName, email, password });
+    //creo siempre como alumno
+    const user = await User.create({
+      firstName,
+      lastName,
+      email,
+      password,
+      role: 'student'
+    });
     const token = generateToken(user._id, user.role);
     res.status(201).json({ token });
   } catch (err) {
     next(err);
   }
 };
+
 
 // POST /auth/login
 exports.login = async (req, res, next) => {

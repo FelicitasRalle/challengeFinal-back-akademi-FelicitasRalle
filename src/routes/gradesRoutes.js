@@ -1,11 +1,11 @@
 const express = require('express');
 const { body } = require('express-validator');
-const{
-    createGrade,
-    updateGrade,
-    getGradesByStudent
+const {
+   createGrade,
+   updateGrade,
+   getGradesByStudent
 } = require('../controllers/gradeController');
-const { protect, restricTo } = require('../middleware/authMiddleware');
+const { protect, restrictTo } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 

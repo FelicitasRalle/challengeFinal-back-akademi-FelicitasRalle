@@ -1,5 +1,7 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const bycrypt = require('bcryptjs');
+const nodemailer = require('nodemailer');
 
 //genero jwt
 const generateToken = (id, role) => {

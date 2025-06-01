@@ -1,11 +1,18 @@
 const express = require('express');
 require('dotenv').config();
 const connectDB = require('./config/db');
+const cors = require('cors');
 
 const app = express();
 
 //middleware global
 app.use(express.json());
+
+//cors
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true
+}));
 
 //conexion a mongo
 connectDB();

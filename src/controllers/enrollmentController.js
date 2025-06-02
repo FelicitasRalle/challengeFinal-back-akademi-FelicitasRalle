@@ -51,6 +51,7 @@ exports.createEnrollment = async (req, res, next) => {
 
     //hago la inscripcion
     const enrollment = await Enrollment.create({ student: studentId, course: courseId });
+    console.log("Inscripción creada:", enrollment); 
     res.status(201).json(enrollment);
   } catch (err) {
     if (err.code === 11000) {

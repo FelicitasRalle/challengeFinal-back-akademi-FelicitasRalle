@@ -7,7 +7,7 @@ exports.createUser = async (req, res, next) => {
   try {
     const { firstName, lastName, email, password, role } = req.body;
     //valido el rol
-    if (!['professor', 'superadmin'].includes(role)) {
+    if (!['professor', 'superadmin', 'student'].includes(role)) {
       return res.status(400).json({ message: 'Rol inválido' });
     }
     //crear usuario

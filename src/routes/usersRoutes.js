@@ -25,7 +25,7 @@ router.post(
     body("role")
       .notEmpty()
       .withMessage("role es obligatorio")
-      .isIn(["professor", "superadmin"])
+      .isIn(["professor", "superadmin", "student"])
       .withMessage("role inválido"),
   ],
   createUser

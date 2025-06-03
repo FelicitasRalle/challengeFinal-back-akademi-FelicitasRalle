@@ -90,23 +90,25 @@ exports.getUser = async (req, res, next) => {
 //PUT/users:id (editar su perfil, superadmin o el propio usuario)
 exports.updateUser = async (req, res, next) => {
   try {
-    //pruebo primero con nom y ap
-    const { firstName, lastName, email, role } = req.body;
+    const updates = (({ firstName, lastName, email, role }) => ({ firstName, lastName, email, role }))(req.body);
 
-    const user = await User.findByIdAndUpdate(req.params.id, updates, {
-      new: true,
-      runValidators: true,
-    }).select("-password");
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      updates,
+      { new: true, runValidators: true }
+    ).select('-password');
 
     if (!user) {
-      return res.status(404).json({ message: "Usuario no existe" });
+      return res.status(404).json({ message: 'Usuario no existe' });
     }
 
     res.json(user);
   } catch (err) {
-    next(err);
+    console.error("Error en updateUser:", err); 
+    res.status(500).json({ message: 'Error interno del servidor', error: err.message });
   }
 };
+
 
 //DELETE/users:id (solo superadmin)
 exports.deleteUser = async (req, res, next) => {

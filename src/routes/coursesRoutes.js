@@ -6,7 +6,7 @@ const {
   createCourse,
   updateCourse,
   deleteCourse,
-  getCoursesByProfessor
+  getCoursesByLoggedProfessor
 } = require('../controllers/courseController');
 const { protect, restrictTo } = require('../middleware/authMiddleware');
 
@@ -19,6 +19,7 @@ router.get('/', restrictTo('student','superadmin'), getCourses);
 router.post('/', restrictTo('professor','superadmin'), createCourse);
 router.put('/:id', restrictTo('professor','superadmin'), updateCourse);
 router.delete('/:id', restrictTo('professor','superadmin'), deleteCourse);
-router.get('/professor/:professorId', restrictTo('professor','superadmin'), getCoursesByProfessor);
+router.get('/professor', restrictTo('professor', 'superadmin'), getCoursesByLoggedProfessor);
+
 
 module.exports = router;

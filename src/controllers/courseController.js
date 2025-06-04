@@ -113,19 +113,11 @@ exports.deleteCourse = async (req, res, next) => {
   }
 };
 
-//GET/courses/professor/:professorId
-exports.getCoursesByProfessor = async (req, res, next) => {
+//GET/courses/professor (solo cursos del profesor logueado)
+exports.getCoursesByLoggedProfessor = async (req, res, next) => {
   try {
-    const { professorId } = req.params;
-    //el profesor solo puede ver sus cursos
-    if (
-      req.user.rolo !== "professor" ||
-      req.user._id.toString() !== professorId
-    ) {
-      return res.status(403).json({ message: "Acceso denegado" });
-    }
-    const courses = await Course.find({ professor: professorId });
-    res.josn(courses);
+    const courses = await Course.find({ professor: req.user._id });
+    res.json(courses);
   } catch (err) {
     next(err);
   }

@@ -103,7 +103,7 @@ exports.getEnrollmentsByCourse = async (req, res, next) => {
     const enrollments = await Enrollment
       .find({ course: courseId })
       .populate('student', 'firstName lastName email');
-    res.json(enrollments);
+    res.json({ enrollments });
   } catch (err) {
     next(err);
   }

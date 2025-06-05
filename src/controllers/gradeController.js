@@ -31,26 +31,33 @@ exports.createGrade = async (req, res, next) => {
 
 
 //PUT/grades/:id
-exports.updateGrade = async (req, res, next)=>{
-    try{
-        const grade = await Grade.findById(req.params.id);
-        if(!grade){
-            return res.status(404).json({ message: 'No se encontro la calificacion' });
-        }
+exports.createGrade = async (req, res, next) => {
+  try {
+    const { studentId, courseId, value, trimester } = req.body;
 
-        //verifico q el profesor sea el encargado del curso correspondiente
-        const course = await Course.findById(grade.course);
-        if(course.professor.toString() !== req.user._id.toString()){
-            return res.status(403).json({ message: 'No esta autorizado para editar esta calificacion' });
-        }
-
-        grade.value = req.body.value;
-        await grade.save();
-        res.json(grade);
-    }catch(err){
-        next(err);
+    if (![1, 2, 3].includes(trimester)) {
+      return res.status(400).json({ message: 'Trimestre inválido. Debe ser 1, 2 o 3' });
     }
+
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: 'No se encontró el curso' });
+    }
+
+    if (course.professor.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'No está autorizado para calificar este curso' });
+    }
+
+    const grade = await Grade.create({ student: studentId, course: courseId, value, trimester });
+    res.status(201).json(grade);
+  } catch (err) {
+    if (err.code === 11000) {
+      return res.status(400).json({ message: 'Ya existe una calificación para este alumno, curso y trimestre' });
+    }
+    next(err);
+  }
 };
+
 
 exports.getGradesByStudent = async (req, res, next) => {
   try {

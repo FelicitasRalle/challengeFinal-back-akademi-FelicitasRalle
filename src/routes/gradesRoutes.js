@@ -1,35 +1,27 @@
 const express = require('express');
-const { body } = require('express-validator');
 const {
-   createGrade,
-   updateGrade,
-   getGradesByStudent
-} = require('../controllers/gradeController');
+  getCourses,
+  getCoursesById,
+  createCourse,
+  updateCourse,
+  deleteCourse,
+  getCoursesByLoggedProfessor
+} = require('../controllers/courseController');
 const { protect, restrictTo } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-//todas las rutas necesitaran el token valido
+//proteccion a todas las rutas
 router.use(protect);
 
-router.post(
-  '/',
-  restrictTo('professor', 'superadmin'),
-  body('studentId').notEmpty().isMongoId(),
-  body('courseId' ).notEmpty().isMongoId(),
-  body('value'    ).isFloat({ min:0, max:100 }),
-  createGrade
-);
-router.put(
-  '/:id',
-  restrictTo('professor', 'superadmin'),
-  body('value').isFloat({ min:0, max:100 }),
-  updateGrade
-);
-router.get(
-  '/student/:studentId',
-  restrictTo('professor','student', 'superadmin'),
-  getGradesByStudent
-);
+router.get('/', restrictTo('student','superadmin'), getCourses);
+router.post('/', restrictTo('professor','superadmin'), createCourse);
+router.put('/:id', restrictTo('professor','superadmin'), updateCourse);
+router.delete('/:id', restrictTo('professor','superadmin'), deleteCourse);
+router.get('/professor', restrictTo('professor', 'superadmin'), getCoursesByLoggedProfessor);
+
 
 module.exports = router;
+
+
+

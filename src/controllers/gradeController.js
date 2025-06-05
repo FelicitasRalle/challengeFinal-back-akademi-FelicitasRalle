@@ -38,20 +38,21 @@ exports.createOrUpdateGrade = async (req, res, next) => {
 // PUT /grades/:id - Editar nota existente
 exports.updateGrade = async (req, res, next) => {
   try {
-    const { value } = req.body;
-    const grade = await Grade.findById(req.params.id).populate("course");
+    const { value, trimester } = req.body;
 
-    if (!grade) {
-      return res.status(404).json({ message: "Nota no encontrada" });
+    if (![1, 2, 3].includes(Number(trimester))) {
+      return res.status(400).json({ message: "Trimestre inválido" });
     }
 
+    const grade = await Grade.findById(req.params.id).populate('course');
+    if (!grade) return res.status(404).json({ message: "Nota no encontrada" });
+
     if (grade.course.professor.toString() !== req.user._id.toString()) {
-      return res
-        .status(403)
-        .json({ message: "No autorizado para editar esta nota" });
+      return res.status(403).json({ message: "No autorizado para editar esta nota" });
     }
 
     grade.value = value;
+    grade.trimester = trimester;
     await grade.save();
 
     res.status(200).json(grade);
@@ -59,6 +60,7 @@ exports.updateGrade = async (req, res, next) => {
     next(err);
   }
 };
+
 
 // GET /grades/student/:id - Ver notas del alumno
 exports.getGradesByStudent = async (req, res, next) => {
@@ -119,6 +121,22 @@ exports.getGradesByCourse = async (req, res, next) => {
       .sort({ createdAt: -1 });
 
     res.json(grades);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.deleteGrade = async (req, res, next) => {
+  try {
+    const grade = await Grade.findById(req.params.id).populate("course");
+    if (!grade) return res.status(404).json({ message: "Nota no encontrada" });
+
+    if (grade.course.professor.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "No autorizado para eliminar esta nota" });
+    }
+
+    await grade.deleteOne();
+    res.status(204).end();
   } catch (err) {
     next(err);
   }

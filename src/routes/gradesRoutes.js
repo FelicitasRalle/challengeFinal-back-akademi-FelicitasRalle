@@ -3,7 +3,8 @@ const {
   createOrUpdateGrade,
   updateGrade,
   getGradesByStudent,
-  getGradesByCourse
+  getGradesByCourse,
+  deleteGrade
 } = require('../controllers/gradeController');
 const { protect, restrictTo } = require('../middleware/authMiddleware');
 
@@ -16,6 +17,7 @@ router.get('/course/:courseId', getGradesByCourse);
 router.post('/', createOrUpdateGrade);
 router.put('/:id', updateGrade);
 router.get('/student/:studentId', getGradesByStudent);
+router.delete('/:id', deleteGrade);
 
 module.exports = router;
 

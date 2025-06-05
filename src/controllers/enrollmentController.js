@@ -39,27 +39,37 @@ exports.createEnrollment = async (req, res, next) => {
     const studentId = req.user._id;
     const { courseId } = req.body;
 
-    // verifico el cupo y q exista el curso
+    if (!courseId) {
+      return res.status(400).json({ message: 'Falta el ID del curso' });
+    }
+
     const course = await Course.findById(courseId);
     if (!course) {
       return res.status(404).json({ message: 'Curso no encontrado' });
     }
+
+    // Verificar si ya está inscrito
+    const yaInscripto = await Enrollment.findOne({ student: studentId, course: courseId });
+    if (yaInscripto) {
+      return res.status(400).json({ message: 'Ya estás inscrito en este curso' });
+    }
+
+    // Validar cupo
     const count = await Enrollment.countDocuments({ course: courseId });
     if (count >= course.maxStudents) {
       return res.status(400).json({ message: 'Cupo máximo alcanzado' });
     }
 
-    //hago la inscripcion
     const enrollment = await Enrollment.create({ student: studentId, course: courseId });
-    console.log("Inscripción creada:", enrollment); 
+    console.log("Inscripción creada:", enrollment);
+    console.log("Enviando respuesta:", enrollment);
     res.status(201).json(enrollment);
   } catch (err) {
-    if (err.code === 11000) {
-      return res.status(400).json({ message: 'Ya estás inscrito en este curso' });
-    }
+    console.error("Error al inscribirse:", err);
     next(err);
   }
 };
+
 
 //DELETE/enrollments/:id (solo estudiante)
 exports.deleteEnrollment = async (req, res, next) => {

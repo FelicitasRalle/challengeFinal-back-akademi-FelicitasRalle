@@ -2,8 +2,9 @@ const express = require('express');
 const {
   createOrUpdateGrade,
   updateGrade,
-  getGradesByStudent
-} = require('../controllers/gradesController');
+  getGradesByStudent,
+  getGradesByCourse
+} = require('../controllers/gradeController');
 const { protect, restrictTo } = require('../middleware/authMiddleware');
 
 const router = express.Router();

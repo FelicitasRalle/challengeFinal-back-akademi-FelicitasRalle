@@ -145,3 +145,14 @@ exports.deleteGrade = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.getAllGrades = async (req, res, next) => {
+  try {
+    const grades = await Grade.find()
+      .populate('student', 'firstName lastName')
+      .populate('course', 'title');
+    res.json(grades);
+  } catch (err) {
+    next(err);
+  }
+};

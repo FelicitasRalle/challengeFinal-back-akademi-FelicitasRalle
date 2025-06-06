@@ -1,5 +1,6 @@
 const Course = require("../models/Course");
 const Enrollment = require("../models/Enrollment");
+const Grade = require("../models/Grade");
 
 //GET/courses (solo alumno)
 exports.getCourses = async (req, res, next) => {
@@ -15,7 +16,8 @@ exports.getCourses = async (req, res, next) => {
     } = req.query;
 
     const filter = {};
-    if (category) filter.category = { $regex: new RegExp(`^${category}$`, 'i') };
+    if (category)
+      filter.category = { $regex: new RegExp(`^${category}$`, "i") };
     if (level) filter.level = level;
     if (minPrice || maxPrice) {
       filter.price = {};
@@ -100,13 +102,26 @@ exports.deleteCourse = async (req, res, next) => {
   try {
     const course = await Course.findById(req.params.id);
     if (!course) {
-      return res.status(404).json({ message: "No se encontro el curso" });
+      return res.status(404).json({ message: "No se encontró el curso" });
     }
 
-    if (course.professor.toString() !== req.user._id.toString() && req.user.role !== "superadmin") {
+    if (
+      course.professor.toString() !== req.user._id.toString() &&
+      req.user.role !== "superadmin"
+    ) {
       return res
         .status(403)
         .json({ message: "No autorizado para eliminar este curso" });
+    }
+
+    const inscripciones = await Enrollment.countDocuments({
+      course: course._id,
+    });
+    if (inscripciones > 0) {
+      return res.status(409).json({
+        message:
+          "No se puede eliminar el curso porque tiene alumnos inscriptos",
+      });
     }
 
     await Grade.deleteMany({ course: course._id });
@@ -115,7 +130,8 @@ exports.deleteCourse = async (req, res, next) => {
 
     res.json({ message: "Curso eliminado" });
   } catch (err) {
-    next(err);
+    console.error("Error al eliminar curso:", err);
+    res.status(500).json({ message: "Error interno al eliminar el curso" });
   }
 };
 

@@ -14,7 +14,7 @@ exports.getCourses = async (req, res, next) => {
     } = req.query;
 
     const filter = {};
-    if (category) filter.category = category;
+    if (category) filter.category = { $regex: new RegExp(`^${category}$`, 'i') };
     if (level) filter.level = level;
     if (minPrice || maxPrice) {
       filter.price = {};

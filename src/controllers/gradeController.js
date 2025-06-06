@@ -66,6 +66,10 @@ exports.updateGrade = async (req, res, next) => {
 exports.getGradesByStudent = async (req, res, next) => {
   try {
     const { studentId } = req.params;
+    console.log("studentId recibido:", studentId);
+console.log("req.user._id desde token:", req.user._id);
+console.log("req.user.role:", req.user.role);
+
     const { page = 1, limit = 10, sort = "-createdAt" } = req.query;
 
     if (req.user.role === "student" && req.user._id.toString() !== studentId) {

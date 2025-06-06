@@ -1,4 +1,6 @@
 const express = require('express');
+const User = require("../models/User");
+const bcrypt = require("bcryptjs");
 const { body } = require('express-validator');
 const{
   register,
@@ -51,5 +53,3 @@ router.post(
 );
 
 module.exports = router;
-
-

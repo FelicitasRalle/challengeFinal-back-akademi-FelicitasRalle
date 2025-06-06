@@ -30,6 +30,7 @@ router.post(
   ],
   createUser
 );
+
 router.get("/", restrictTo("superadmin"), getAllUsers);
 router.get("/:id", getUser);
 router.put("/:id", updateUser);

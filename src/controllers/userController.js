@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const Course = require("../models/Course");
+const { validationResult } = require("express-validator");
 
 // POST/users
 //creo un usuario con rol 'professor' o 'superadmin' (solo superadmin)

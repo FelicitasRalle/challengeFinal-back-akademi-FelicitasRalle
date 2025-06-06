@@ -71,9 +71,7 @@ exports.forgotPassword = async (req, res, next) => {
     });
 
     //creo la url de reset
-    const resetUrl = `${req.protocol}://${req.get(
-      "host"
-    )}/auth/reset-password?token=${resetToken}`;
+    const resetUrl = `http://localhost:5173/reset-password?token=${resetToken}`;
 
     const transporter = nodemailer.createTransport({
       host: process.env.EMAIL_HOST,

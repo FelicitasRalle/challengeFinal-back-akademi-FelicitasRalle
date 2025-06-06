@@ -111,30 +111,35 @@ exports.updateUser = async (req, res, next) => {
 
 
 //DELETE/users:id (solo superadmin)
+const Enrollment = require("../models/Enrollment");
+const Grade = require("../models/Grade");
+
 exports.deleteUser = async (req, res, next) => {
   try {
-    //busco primero un usuario sin eliminarlo
     const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({ message: "Usuario no existe" });
     }
 
-    //si es profesor, verifico si tiene cursos asociados
     if (user.role === "professor") {
       const count = await Course.countDocuments({ professor: user._id });
       if (count > 0) {
-        return res
-          .status(409)
-          .json({
-            message: "No se puede eliminar un profesor con cursos asignados",
-          });
+        return res.status(409).json({
+          message: "No se puede eliminar un profesor con cursos asignados",
+        });
       }
     }
 
-    //eliminar si paso la validacion
+    //si es student, elimino sus inscripciones y calificaciones
+    if (user.role === "student") {
+      await Enrollment.deleteMany({ student: user._id });
+      await Grade.deleteMany({ student: user._id });
+    }
+
     await User.findByIdAndDelete(req.params.id);
     res.json({ message: "Usuario eliminado" });
   } catch (err) {
     next(err);
   }
 };
+

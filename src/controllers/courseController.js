@@ -1,4 +1,5 @@
 const Course = require("../models/Course");
+const Enrollment = require("../models/Enrollment");
 
 //GET/courses (solo alumno)
 exports.getCourses = async (req, res, next) => {
@@ -94,19 +95,24 @@ exports.updateCourse = async (req, res, next) => {
   }
 };
 
-//DELETE/courses/:id (solo el profesor y el superadmin)
+//DELETE /courses/:id (solo el profesor y el superadmin)
 exports.deleteCourse = async (req, res, next) => {
   try {
     const course = await Course.findById(req.params.id);
     if (!course) {
       return res.status(404).json({ message: "No se encontro el curso" });
     }
-    if (course.professor.toString() !== req.user._id.toString()) {
+
+    if (course.professor.toString() !== req.user._id.toString() && req.user.role !== "superadmin") {
       return res
         .status(403)
         .json({ message: "No autorizado para eliminar este curso" });
     }
+
+    await Grade.deleteMany({ course: course._id });
+    await Enrollment.deleteMany({ course: course._id });
     await Course.findByIdAndDelete(req.params.id);
+
     res.json({ message: "Curso eliminado" });
   } catch (err) {
     next(err);
